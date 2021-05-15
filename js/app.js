@@ -238,7 +238,7 @@ function initEnemies(){
     const y = ENEMY_VERTICAL_PADDING + j * ENEMY_VERTICAL_SPACING  ;
     const x = i * enemySpacing + ENEMY_HORIZONTAL_PADDING *Math.random()*9;
     // var notValid = true;
-    if(x <CANVAS_WIDTH + ENEMY.width && x>=0 && y <CANVAS_HEIGHT-PLAYER.height-10 && y>=0 ){
+    if(x <CANVAS_WIDTH - ENEMY.width && x>=0 && y <CANVAS_HEIGHT-PLAYER.height-10 && y>=0 ){
         createEnemy(x, y);
         createdEnemies++;
     }
