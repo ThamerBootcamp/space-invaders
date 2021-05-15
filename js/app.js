@@ -4,6 +4,7 @@ let context = canvas.getContext("2d");
 const KEY_CODE_LEFT = 37;
 const KEY_CODE_RIGHT = 39;
 const KEY_CODE_SPACE = 32;
+const KEY_CODE_ENTER = 13;
 
 
 const PLAYER_MAX_SPEED = 600.0;
@@ -294,7 +295,7 @@ function onKeyDown(e) {
     GAME_STATE.leftPressed = true;
   } else if (e.keyCode === KEY_CODE_RIGHT) {
     GAME_STATE.rightPressed = true;
-  } else if (e.keyCode === KEY_CODE_SPACE) {
+  } else if (e.keyCode === KEY_CODE_SPACE || e.keyCode ===KEY_CODE_ENTER) {
     GAME_STATE.spacePressed = true;
   }
 }
@@ -303,7 +304,7 @@ function onKeyUp(e) {
     GAME_STATE.leftPressed = false;
   } else if (e.keyCode === KEY_CODE_RIGHT) {
     GAME_STATE.rightPressed = false;
-  } else if (e.keyCode === KEY_CODE_SPACE) {
+  } else if (e.keyCode === KEY_CODE_SPACE || e.keyCode === KEY_CODE_ENTER) {
     GAME_STATE.spacePressed = false;
   }
 }
