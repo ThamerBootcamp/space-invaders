@@ -1,0 +1,10 @@
+#canvas, #background {
+    width: 1000px;
+    height: 500px;
+    position: relative;
+    display: block;
+}
+
+#canvas {
+    margin-top: -500px;
+}

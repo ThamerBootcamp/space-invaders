@@ -1,0 +1,6 @@
+// export {ALIEN_WIDTH} 
+export { ALIEN_WIDTH, ALIEN_HEIGHT };
+
+let ALIEN_WIDTH = 20;
+let ALIEN_HEIGHT = 20;
+
