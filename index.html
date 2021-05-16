@@ -14,8 +14,20 @@
   <body >
       <div class="container">
           <h1 >Space Invaders</h1>
-          <div class="row col-md-3  d-flex flex-row-reverse p-3">
-            <button class="btn btn-secondary" id="restart"  onClick="window.location.reload();"> Restart</button>
+          <div class="col-md-6 row  p-3">
+            <!-- <div class=" col-md-3 ">
+              <button class="btn btn-secondary btn-sm" id="restart"  onmouseup="window.location.reload();"> Restart</button>
+            </div>  -->
+            <div class="col-md-3">
+              <button class="btn btn-success btn-sm" id="easy"  onmouseup="window.location.reload();"> Easy</button>
+            </div>  
+            <div class="col-md-3">
+              <button class="btn btn-warning btn-sm" id="medium"  onmouseup="setMed()"> Medium</button>
+            </div>            
+            <div class="col-md-3">
+              <button class="btn btn-danger btn-sm" id="hard"  onmouseup="setHard();"> Hard</button>
+            </div>
+
           </div>
       </div>
 

@@ -7,13 +7,13 @@ const KEY_CODE_SPACE = 32;
 const KEY_CODE_ENTER = 13;
 
 
-const PLAYER_MAX_SPEED = 600.0;
+const PLAYER_MAX_SPEED = 500.0;
 var playerImg = new Image(); 
 playerImg.src = './img/1spaceship.png';
 
 const LASER_MAX_SPEED = 500.0;
-const LASER_COOLDOWN = 0.25;
-const LASER_DAMAGE = 10;
+const LASER_COOLDOWN = 0.2;
+let LASER_DAMAGE = 20;
 var laserImg = new Image();   
 laserImg.src = './img/beam1.png';
 
@@ -26,26 +26,26 @@ wallImg.src = './img/wall.png';
 var bossImg = new Image();   
 bossImg.src = './img/boss.png';
 
-const BOSS_LASER_MAX_SPEED = 450.0;
-const BOSS_LASER_COOLDOWN = 0.55;
+let BOSS_LASER_MAX_SPEED = 450.0;
+let BOSS_LASER_COOLDOWN = 0.75;
 var bossLaserImg = new Image();   
 bossLaserImg.src = './img/bossLaser.png';
 
 const CANVAS_WIDTH = 1000;
 const CANVAS_HEIGHT = 500;
-const GRAVITY_FORCE = 0.9;
+let GRAVITY_FORCE = 1;
 let isStart = true; 
 
 let isBossReady = false;
 let isBossFirstSpawn = true;
-const NUMBER_OF_ENEMIES= 10;
+let NUMBER_OF_ENEMIES= 10;
 const MAX_ENEMIES_PER_ROW = 8;
 const ENEMY_HORIZONTAL_PADDING = 50;
 const ENEMY_VERTICAL_PADDING = 70;
 const ENEMY_VERTICAL_SPACING = 60;
 const ENEMY_COOLDOWN = 5.0;
 
-const GAME_STATE = {
+let GAME_STATE = {
   playerX: 0,
   playerY: 0,
   loss: false,
@@ -77,7 +77,7 @@ const ENEMY ={
   height: 50
 } 
 const WALL ={
-  width: 80,
+  width: 100,
   height: 50
 } 
 const BOSS ={
@@ -102,6 +102,43 @@ function draw(){
     context.clearRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
 
     render();
+}
+function setHard(){
+  if(GAME_STATE.spacePressed ==false){
+    context.clearRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
+    NUMBER_OF_ENEMIES = 25
+    WALL.width=30 
+    LASER_DAMAGE = 10
+    BOSS_LASER_COOLDOWN = 0.2
+    BOSS_LASER_MAX_SPEED = 600
+    GRAVITY_FORCE = 2
+  
+    restart()
+  }
+  
+}
+function setMed(){
+  if(GAME_STATE.spacePressed ==false){
+    context.clearRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
+    NUMBER_OF_ENEMIES = 20
+    WALL.width= 50
+    LASER_DAMAGE = 15
+    BOSS_LASER_COOLDOWN = 0.5
+    BOSS_LASER_MAX_SPEED = 500
+    GRAVITY_FORCE = 1.5
+  
+    restart()
+  }
+  
+}
+function restart(){
+  isStart = true
+  isBossReady = false
+  GAME_STATE.walls = []
+  GAME_STATE.enemies = []
+  GAME_STATE.loss = false
+  GAME_STATE.win = false
+
 }
 
 function render() {
@@ -235,21 +272,14 @@ function initEnemies(){
   while(createdEnemies != NUMBER_OF_ENEMIES){
     var j =Math.random()*3;
     var i = Math.random()* MAX_ENEMIES_PER_ROW;
-    const y = ENEMY_VERTICAL_PADDING + j * ENEMY_VERTICAL_SPACING  ;
+    const y = (ENEMY_VERTICAL_PADDING + j * ENEMY_VERTICAL_SPACING )- (CANVAS_HEIGHT/2) ;
     const x = i * enemySpacing + ENEMY_HORIZONTAL_PADDING *Math.random()*9;
     // var notValid = true;
-    if(x <CANVAS_WIDTH - ENEMY.width && x>=0 && y <CANVAS_HEIGHT-PLAYER.height-10 && y>=0 ){
+    if(x <CANVAS_WIDTH - ENEMY.width && x>=0 && y <CANVAS_HEIGHT-PLAYER.height-10 && y>= (-CANVAS_HEIGHT/2) ){
         createEnemy(x, y);
         createdEnemies++;
     }
   }
-  // for (let j = 0; j < 2; j++) {
-  //   const y = ENEMY_VERTICAL_PADDING + j * ENEMY_VERTICAL_SPACING  ;
-  //   for (let i = 0; i < ENEMIES_PER_ROW; i++) {
-  //     const x = i * enemySpacing + ENEMY_HORIZONTAL_PADDING *Math.random();
-  //     createEnemy(x, y);
-  //   }
-  // }
 }
 function initWalls(){
   const WALL_VERTICAL_PADDING = CANVAS_HEIGHT - CANVAS_HEIGHT/3 - PLAYER.height -50
@@ -363,18 +393,20 @@ function updateLasers(dt){
         element.isDead = true;
       }
     });
-    const r2 = {
-      top: GAME_STATE.bossY,
-      left: GAME_STATE.bossX ,
-      right:(GAME_STATE.bossX+BOSS.width),
-      bottom: (GAME_STATE.bossY + BOSS.height)
-    }
-
-    if (rectsIntersect(r1, r2)) {
-      GAME_STATE.bossHealth-=LASER_DAMAGE
-      element.isDead = true;
-      if(GAME_STATE.bossHealth<=0){
-        GAME_STATE.win = true;
+    if(isBossReady){
+      const r2 = {
+        top: GAME_STATE.bossY,
+        left: GAME_STATE.bossX ,
+        right:(GAME_STATE.bossX+BOSS.width),
+        bottom: (GAME_STATE.bossY + BOSS.height)
+      }
+  
+      if (rectsIntersect(r1, r2)) {
+        GAME_STATE.bossHealth-=LASER_DAMAGE
+        element.isDead = true;
+        if(GAME_STATE.bossHealth<=0){
+          GAME_STATE.win = true;
+        }
       }
     }
   });
@@ -428,7 +460,7 @@ function updateEnemies(dt) {
   });
 
   GAME_STATE.enemies = GAME_STATE.enemies.filter(e => !e.isDead);
-  if(GAME_STATE.enemies.length==0 && !isBossReady){
+  if(GAME_STATE.enemies.length==0 && !isBossReady && !isStart){
     isBossReady = true;
     GAME_STATE.bossHealth = 100;
   }
@@ -437,13 +469,13 @@ function updateEnemies(dt) {
 function updateBoss(dt) {
   var randVal = 0;
   if(Math.random()*2>1){
-    randVal = Math.random()* 5;
+    randVal = Math.random()* 4;
   }else{
-    randVal = Math.random() * -5;
+    randVal = Math.random() * -4;
   }
-  const dx = Math.sin(GAME_STATE.lastTime / 1000.0) * 4// -randVal;
-  const dy = Math.cos(GAME_STATE.lastTime / 1000.0) * 0.5;
-  if((GAME_STATE.bossX + dx)<= CANVAS_WIDTH && (GAME_STATE.bossX + dx> 0)) GAME_STATE.bossX += dx;
+  const dx = Math.sin(GAME_STATE.lastTime / 1000.0) *3 +  Math.sin(GAME_STATE.lastTime / 1000.0) *2// -randVal;
+  const dy = Math.cos(GAME_STATE.lastTime / 1000.0) * 0.8;
+  if((GAME_STATE.bossX + dx)<= canvas.width && (GAME_STATE.bossX + dx> -BOSS.width)) GAME_STATE.bossX += dx;
   else{
     GAME_STATE.bossX += 0
   }
@@ -514,10 +546,3 @@ function bossHealthbar(x, y, per, width, thickness){
   
   context.fillText("Boss health",x,y+thickness+10);
 }
-
-// var t = 100;
-// setInterval(function(){
-// ctx.clearRect(0,0,400,400);
-// draw_healthbar(200,200, t--, 100, 10);  
-// }, 150);
-// };
