@@ -80,6 +80,8 @@ const WALL ={
   width: 100,
   height: 50
 } 
+let NUMBER_OF_WALLS =3
+
 const BOSS ={
   width: 75,
   height: 75
@@ -104,31 +106,32 @@ function draw(){
     render();
 }
 function setHard(){
-  if(GAME_STATE.spacePressed ==false){
-    context.clearRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
-    NUMBER_OF_ENEMIES = 25
-    WALL.width=30 
-    LASER_DAMAGE = 10
-    BOSS_LASER_COOLDOWN = 0.2
-    BOSS_LASER_MAX_SPEED = 600
-    GRAVITY_FORCE = 2
+  context.clearRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
+  isBossFirstSpawn = true
+  NUMBER_OF_ENEMIES = 30
+  NUMBER_OF_WALLS = 1
+  WALL.width=75
+  LASER_DAMAGE = 10
+  BOSS_LASER_COOLDOWN = 0.2
+  BOSS_LASER_MAX_SPEED = 600
+  GRAVITY_FORCE = 2
+
+  restart()
   
-    restart()
-  }
   
 }
 function setMed(){
-  if(GAME_STATE.spacePressed ==false){
-    context.clearRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
-    NUMBER_OF_ENEMIES = 20
-    WALL.width= 50
-    LASER_DAMAGE = 15
-    BOSS_LASER_COOLDOWN = 0.5
-    BOSS_LASER_MAX_SPEED = 500
-    GRAVITY_FORCE = 1.5
-  
-    restart()
-  }
+  context.clearRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
+  isBossFirstSpawn = true
+  NUMBER_OF_WALLS = 2
+  NUMBER_OF_ENEMIES = 20
+  WALL.width= 75
+  LASER_DAMAGE = 15
+  BOSS_LASER_COOLDOWN = 0.5
+  BOSS_LASER_MAX_SPEED = 500
+  GRAVITY_FORCE = 1.5
+
+  restart()
   
 }
 function restart(){
@@ -136,6 +139,8 @@ function restart(){
   isBossReady = false
   GAME_STATE.walls = []
   GAME_STATE.enemies = []
+  GAME_STATE.bossLasers = []
+  GAME_STATE.lasers = []
   GAME_STATE.loss = false
   GAME_STATE.win = false
 
@@ -285,11 +290,16 @@ function initWalls(){
   const WALL_VERTICAL_PADDING = CANVAS_HEIGHT - CANVAS_HEIGHT/3 - PLAYER.height -50
   const WALL_HORIZONTAL_PADDING = 200;
   const WALL_VERTICAL_SPACING = WALL.height
-  const WALLS_PER_ROW =2
+  let wallSpacing 
+  if(NUMBER_OF_WALLS >1){
+    wallSpacing = (CANVAS_WIDTH - WALL_HORIZONTAL_PADDING *2) / (NUMBER_OF_WALLS - 1);
 
-  const wallSpacing = (CANVAS_WIDTH - WALL_HORIZONTAL_PADDING *2) / (WALLS_PER_ROW - 1);
+  }
+  else {
+    wallSpacing =0
+  }
 
-  for (let i = 0; i < WALLS_PER_ROW; i++) {
+  for (let i = 0; i < NUMBER_OF_WALLS; i++) {
     const y = WALL_VERTICAL_PADDING + (3*Math.random() )* WALL_VERTICAL_SPACING  ;
 
     const x = i * wallSpacing + WALL_HORIZONTAL_PADDING *Math.random();
@@ -467,19 +477,15 @@ function updateEnemies(dt) {
 }
 
 function updateBoss(dt) {
-  var randVal = 0;
-  if(Math.random()*2>1){
-    randVal = Math.random()* 4;
-  }else{
-    randVal = Math.random() * -4;
-  }
-  const dx = Math.sin(GAME_STATE.lastTime / 1000.0) *3 +  Math.sin(GAME_STATE.lastTime / 1000.0) *2// -randVal;
-  const dy = Math.cos(GAME_STATE.lastTime / 1000.0) * 0.8;
-  if((GAME_STATE.bossX + dx)<= canvas.width && (GAME_STATE.bossX + dx> -BOSS.width)) GAME_STATE.bossX += dx;
-  else{
-    GAME_STATE.bossX += 0
-  }
-  GAME_STATE.bossY += dy;
+
+  const dx = Math.sin(GAME_STATE.lastTime / 2000) *3 +  Math.sin(GAME_STATE.lastTime / 1000.0)*3
+  const dy = 0//Math.cos(GAME_STATE.lastTime / 1000.0) * 0.7;
+  if((GAME_STATE.bossX + dx)<= canvas.width && (GAME_STATE.bossX + dx> 0)) GAME_STATE.bossX += dx;
+  // else{
+  //   GAME_STATE.bossX += 0
+  // }
+  if ((GAME_STATE.bossY + dy) > 0)GAME_STATE.bossY += dy;
+
   if(isBossReady && GAME_STATE.bossCooldown <=0){
     createBossLaser(GAME_STATE.bossX+BOSS.width/2,GAME_STATE.bossY+BOSS.height);
     GAME_STATE.bossCooldown = BOSS_LASER_COOLDOWN
